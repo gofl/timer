@@ -16,13 +16,29 @@ import java.util.List;
 public enum WorkDayTransitionTable {
 
    DEFAULT(
-      create( WorkDayState.WORK_DAY_START, workDay -> workDay.setStart( LocalDateTime.now() ) ,  WorkDayState.LUNCH_TIME_START ),
-      create( WorkDayState.LUNCH_TIME_START, workDay -> workDay.getLunchTime().setStart( LocalDateTime.now() ) , WorkDayState.LUNCH_TIME_END ),
-      create( WorkDayState.LUNCH_TIME_END, workDay -> workDay.getLunchTime().setEnd( LocalDateTime.now() ) , WorkDayState.WORK_DAY_END ),
+      create( WorkDayState.WORK_DAY_START, workDay -> {
+         LocalDateTime now = LocalDateTime.now();
+         workDay.setStart(now);
+         System.out.println("Have a nice day! " + now);
+         } ,  WorkDayState.LUNCH_TIME_START ),
+      create( WorkDayState.LUNCH_TIME_START, workDay -> {
+                 LocalDateTime now = LocalDateTime.now();
+                 workDay.getLunchTime().setStart(now);
+                 System.out.println("Time for some lunch! " + now);
+      }
+      , WorkDayState.LUNCH_TIME_END ),
+      create( WorkDayState.LUNCH_TIME_END, workDay -> {
+
+         LocalDateTime now = LocalDateTime.now();
+         workDay.getLunchTime().setEnd(now);
+         System.out.println("I hope you enjoyed your lunch! " + now);
+         } , WorkDayState.WORK_DAY_END ),
       create( WorkDayState.WORK_DAY_END,  workDay ->
       {
-         workDay.setEnd( LocalDateTime.now() );
 
+         LocalDateTime now = LocalDateTime.now();
+         workDay.setEnd(now);
+         System.out.println("Done! " + now);
          Path timetable = Paths.get( ".", "timetable.csv" );
 
          if ( !Files.exists( timetable ) ) {
