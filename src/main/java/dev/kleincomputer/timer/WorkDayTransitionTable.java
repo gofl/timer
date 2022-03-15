@@ -27,7 +27,7 @@ public enum WorkDayTransitionTable {
 
          if ( !Files.exists( timetable ) ) {
             try {
-               Files.createFile( timetable );
+               Files.writeString( timetable, "date,from,to,break"+System.lineSeparator(), StandardOpenOption.CREATE_NEW );
             } catch ( IOException e ) {
                e.printStackTrace();
             }
@@ -39,7 +39,7 @@ public enum WorkDayTransitionTable {
             e.printStackTrace();
          }
 
-      }, WorkDayState.WORK_DAY_START )
+      }, WorkDayState.SLEEP )
    );
 
    private final List<WorkDayTransition> transitions;
@@ -55,10 +55,10 @@ public enum WorkDayTransitionTable {
 
    private static String tableLine( WorkDay workDay ) {
       return String.join( ",",
-            workDay.getStart().format( DateTimeFormatter.ISO_LOCAL_DATE_TIME ),
-            workDay.getEnd().format( DateTimeFormatter.ISO_LOCAL_DATE_TIME ),
-            Duration.between( workDay.getLunchTime().getStart(), workDay.getLunchTime().getEnd() )
-                  .toString() )
+            workDay.getStart().withNano(0).format(DateTimeFormatter.ISO_LOCAL_DATE),
+            workDay.getStart().withNano(0).format( DateTimeFormatter.ISO_LOCAL_TIME ),
+            workDay.getEnd().withNano(0).format( DateTimeFormatter.ISO_LOCAL_TIME ),
+            workDay.getLunchTime().getBreak())
             + System.lineSeparator();
    }
 }

@@ -10,36 +10,30 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class TimerApplication {
    public static void main( String... args ) throws IOException, InterruptedException {
 
       ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
       objectMapper.registerModule( new JavaTimeModule() );
 
       Path workDayFile = Paths.get( ".", "state.json" );
 
-      if ( !Files.exists( workDayFile ) ) {
-         WorkDay workDay = new WorkDay();
-         workDay.setState( WorkDayState.WORK_DAY_START );
-         Files.writeString( workDayFile, objectMapper.writeValueAsString( workDay ),
-               StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE_NEW );
+      if( !Files.exists( workDayFile )){
+         Files.createFile( workDayFile );
+
+         resetState(workDayFile, objectMapper, new WorkDay().setState(WorkDayState.WORK_DAY_START));
       }
+
       WorkDay currentWorkDay = objectMapper.readValue(
             Files.readString( workDayFile ), WorkDay.class );
 
-//      if ( currentWorkDay.getStart() != null
-//            && currentWorkDay.getEnd() != null
-//            && currentWorkDay.getState() == WorkDayState.WORK_DAY_END ) {
-//
-//
-//
-//         currentWorkDay = new WorkDay();
-//         currentWorkDay.setState( WorkDayState.WORK_DAY_START );
-//         Files.writeString( workDayFile, objectMapper.writeValueAsString( currentWorkDay ),
-//               StandardOpenOption.TRUNCATE_EXISTING );
-//      }
+      if(currentWorkDay.getState() == WorkDayState.SLEEP){
+         resetState(workDayFile, objectMapper, new WorkDay().setState(WorkDayState.WORK_DAY_START));
+      }
 
       List<WorkDayTransition> transitions = WorkDayTransitionTable.DEFAULT.getTransitions();
 
@@ -49,13 +43,17 @@ public class TimerApplication {
             transition.action().accept( currentWorkDay );
             currentWorkDay.setState( transition.getTo() );
 
-            Files.writeString( workDayFile, objectMapper.writeValueAsString( currentWorkDay ),
-                  StandardOpenOption.TRUNCATE_EXISTING );
+            resetState(workDayFile, objectMapper, currentWorkDay);
 
             break;
          }
       }
 
+   }
+
+   private static void resetState(Path workDayFile, ObjectMapper objectMapper, WorkDay WORK_DAY_START) throws IOException {
+      Files.writeString(workDayFile, objectMapper.writeValueAsString(WORK_DAY_START),
+              StandardOpenOption.TRUNCATE_EXISTING );
    }
 
 

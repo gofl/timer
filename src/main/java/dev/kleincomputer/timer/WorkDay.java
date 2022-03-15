@@ -15,40 +15,40 @@ public class WorkDay {
    public WorkDay() {
    }
 
-   public WorkDay( WorkDayState state ) {
-      this.state = state;
-   }
-
    public LocalDateTime getStart() {
       return start;
    }
 
-   public void setStart( LocalDateTime start ) {
+   public WorkDay setStart(LocalDateTime start) {
       this.start = start;
+      return this;
    }
 
    public LocalDateTime getEnd() {
       return end;
    }
 
-   public void setEnd( LocalDateTime end ) {
+   public WorkDay setEnd(LocalDateTime end) {
       this.end = end;
+      return this;
    }
 
    public LunchTime getLunchTime() {
       return lunchTime;
    }
 
-   public void setLunchTime( LunchTime lunchTime ) {
+   public WorkDay setLunchTime(LunchTime lunchTime) {
       this.lunchTime = lunchTime;
+      return this;
    }
 
    public WorkDayState getState() {
       return state;
    }
 
-   public void setState( WorkDayState state ) {
+   public WorkDay setState(WorkDayState state) {
       this.state = state;
+      return this;
    }
 
    @Override
